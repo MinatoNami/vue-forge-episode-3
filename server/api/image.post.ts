@@ -13,6 +13,26 @@ export default defineEventHandler(async (event) => {
   const openai = new OpenAIApi(configuration);
 
   // 1. make a request to the Chat API to generate the DALL-E prompt
+  const { data } = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content: "You are a prompt engineer creating DALL-E prompts",
+      },
+      {
+        role: "user",
+        content: `Provide 2 realistic physical objects based on this article: ${url}?`,
+      },
+    ],
+    temperature: body.temperature || 1,
+  });
+
+  if (!data.choices[0].message) {
+    throw new Error("No message in response from OpenAI");
+  }
+
+  console.log(data.choices[0].message.content);
   // 2 make a request to DALL-E to generate the image
   // 3. return the image as a base64 encoded string for using with html-to-image on the front-end
 
